@@ -1,0 +1,75 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
+}
+
+dependencies {
+    implementation project(':common')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+    implementation 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.11.0'
+
+    // 스케줄 엔진
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
+    // 운영 관측
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
+    // (선택) API→배치 푸시/재시도 시
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // poi
+    implementation 'org.apache.poi:poi-ooxml:5.3.0'
+    //csv
+    implementation 'com.opencsv:opencsv:5.9'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    // Tibero JDBC 는 상용 라이선스라 저장소에 포함하지 않는다. libs/tibero6-jdbc.jar 를 넣으면 자동으로 추가된다.
+    if (file("$rootDir/libs/tibero6-jdbc.jar").exists()) {
+        implementation(name: "tibero6-jdbc", ext: "jar")
+    }
+
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.mockito', module: 'mockito-core'
+    }
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+
+/**
+ * 프로파일별로 빌드하기 위한 코드
+ */
+ext.profile = (!project.hasProperty('profile') || !profile) ? 'common' : profile
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources-env/${profile}"
+        }
+    }
+}
+
+// 리소스 중복 이슈 방지(앞선 경고 대응)
+tasks.named("processResources") {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+bootJar {
+    archiveFileName = 'batch.jar'
+}
+
+jar {
+    enabled = false
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hscmt.simulation.tag.mapper.WaternetTagMapper">
+
+    <!-- 불필요 수집대상 처리 -->
+    <update id="updateNoneCollectableTag">
+        /* 불필요 수집대상 처리 : waternetTagMapper.updateNoneCollectableTag */
+        update wnet_tag a
+            set use_yn = 'N'
+        where 1=1
+        and not exists (
+            select 1
+            from msrm_ds_d z
+            where 1=1
+            and a.tag_sn = z.tag_sn
+        )
+    </update>
+
+    <!-- 필요 수집대상 처리 -->
+    <update id="updateCollectableTag">
+        /* 필요 수집대상 처리 : waternetTagMapper.updateCollectableTag */
+        update wnet_tag a
+        set use_yn = 'Y'
+        where 1=1
+          and exists (
+            select 1
+            from msrm_ds_d z
+            where 1=1
+              and a.tag_sn = z.tag_sn
+        )
+    </update>
+</mapper>

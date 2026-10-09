@@ -1,0 +1,63 @@
+
+# spring multipart 설정
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1GB
+      max-request-size: 1GB
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: true
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    auto-startup: false
+# swagger ui 설정
+springdoc:
+  api-docs:
+    enabled: true
+    path: /simulation-batch-docs
+    groups:
+      enabled: true
+  swagger-ui:
+    path: /simulation-batch-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    disable-swagger-default-url: true
+    doc-expansion: none
+  default-support-form-data: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+
+# 프로그램 관련
+program:
+  base-path: ${fileserver.base-path}/program
+
+# 라이브러리 관련
+library:
+  base-path: ${fileserver.base-path}/library
+
+# 데이터셋 관련
+dataset:
+  base-path: ${fileserver.base-path}/dataset
+
+# 사용자 관련
+user:
+  thumbnail-path: ${fileserver.base-path}/thumbnail
+
+# 가상환경
+venv:
+  base-path: ${fileserver.base-path}/venv
+
+# 레이어 관련
+layer:
+  base-path: ${fileserver.base-path}/layer
+
+# 배치 관련 설정
+batch:
+  timezone: Asia/Seoul

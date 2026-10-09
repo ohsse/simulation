@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hscmt.simulation.partition.mapper.PartitionMapper">
+    <!-- 파티션 테이블 추가 -->
+    <insert id="createRangePartitionTable" parameterType="java.util.Map">
+        /* 파티션 테이블 추가: postgresPartitionMapper.createRangePartitionTable */
+        create table ${partitionTableName}
+        partition of ${tableName}
+        for values
+        from ('${fromDate}') to ('${toDate}')
+        <if test="hashField != null and hashField != ''">
+            partition by hash (${hashField})
+        </if>
+    </insert>
+
+    <!-- 서브파티션 테이블 추가 -->
+    <insert id="createSubHashPartitionTable">
+        /* 서브파티션 테이블 추가: postgresPartitionMapper.createSubHashPartitionTable */
+        create table ${subPartitionTableName}
+            partition of ${partitionTableName}
+            for values
+            with (modulus ${moduleSize}, remainder ${moduleIndex})
+    </insert>
+
+    <!-- 마지막 파티션 테이블 이름 조회 -->
+    <select id="getLastPartitionTableName">
+        /* 마지막 파티션 테이블 이름 조회 : postgresPartitionMapper.getLastPartitionTableName */
+        select
+            max (child.relname) as last_partition_table_name
+        from
+            pg_inherits inh
+                join pg_class parent on inh.inhparent = parent.oid
+                join pg_class child on inh.inhrelid = child.oid
+        where 1=1
+          and parent.relname = #{tableName}
+    </select>
+
+    <!-- 특정 시점 이전 파티션 목록 조회 -->
+    <select id="getPrevPartitionTableNames">
+        /* 특정파티션 이전 시점의 모든 파티션명 조회 : postgresPartitionMapper.getPrevPartitionTableNames */
+        select
+            child.relname as partition_table_name
+        from
+            pg_inherits inh
+                join pg_class parent on inh.inhparent = parent.oid
+                join pg_class child on inh.inhrelid = child.oid
+        where 1=1
+          and parent.relname = #{tableName}
+          and child.relname &lt;= #{partitionTableName}
+    </select>
+
+    <!-- 파티션 테이블 물리테이블로 분리 -->
+    <update id="detachPartitionTable">
+        /* 파티션 테이블 물리테이블로 분리 : postgresPartitionMapper.detachPartitionTable */
+        alter table ${tableName} detach partition ${partitionTableName}
+    </update>
+
+    <!-- 분리한 파티션 테이블 삭제 -->
+    <update id="dropTable">
+        /* 파티션 테이블 삭제 : partitionMapper.dropTable */
+        drop table if exists ${tableName}
+    </update>
+</mapper>

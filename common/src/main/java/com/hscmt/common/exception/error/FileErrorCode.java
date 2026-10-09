@@ -1,0 +1,16 @@
+package com.hscmt.common.exception.error;
+
+public enum FileErrorCode implements ErrorCode{
+    INVALID_WHEEL_FILE,
+    FILE_UPLOAD_ERROR,
+    INVALID_FILE_EXTENSION,
+    FILE_NOT_FOUND,
+    INVALID_FILE_COUNT,
+    FILE_DELETE_ERROR,
+    FILE_EXPLORER_ERROR,
+    FILE_WRITE_ERROR,
+    MISSING_REQUIRED_SHAPE_FILE,
+    MISMATCHED_SHP_FILENAMES,
+    INVALID_MEASURE_FILE_EXTENSION,
+    ;
+}

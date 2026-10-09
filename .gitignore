@@ -1,0 +1,23 @@
+# 빌드 산출물
+build/
+.gradle/
+out/
+**/src/main/generated/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 로그·덤프
+logs/
+*.log
+*.stackdump
+
+# 로컬 설정·비밀정보
+.env
+.claude/settings.local.json
+.mcp.json
+
+# 상용 라이선스 드라이버 (직접 배치)
+libs/tibero6-jdbc.jar

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hscmt.simulation.layer.mapper.LayerMapper">
+    <!-- 레이어 내역 저장 -->
+    <insert id="upsertLayerList" parameterType="com.hscmt.simulation.layer.dto.LayerListUpsertDto">
+        /* 레이어내역 저장 : layerMapper.upsertLayerList */
+        insert into layer_l (layer_id, ftype, fid, gmtr_val, property, color_str, rgst_id, rgst_dttm ,mdf_id, mdf_dttm)
+        values
+            (
+              #{layerId}
+            , #{ftype}
+            , #{fid}
+            , st_setsrid(st_geomfromtext(#{gmtrVal}), 5186)
+            , cast(#{property} as jsonb)
+            , #{colorStr}
+            , #{loginId}
+            , now()
+            , #{loginId}
+            , now()
+            )
+        on conflict (layer_id, ftype, fid)
+        do update
+           set mdf_id = excluded.mdf_id
+           , mdf_dttm = excluded.mdf_dttm
+           , gmtr_val = excluded.gmtr_val
+           , property = excluded.property
+           , color_str = excluded.color_str
+    </insert>
+
+    <!-- 레이어 사용가능 여부 수정 -->
+    <update id="updateLayerUseAble">
+        /* 레이어 사용가능 여부 수정 : layerMapper.updateLayerUseAble */
+        update layer_m
+            set use_able_yn = 'Y'
+            , layer_ftype = #{featureType}
+            , mdf_id = #{executorId}
+            , mdf_dttm = now()
+        where 1=1
+        and layer_id = #{layerId}
+    </update>
+
+    <!-- 레이어 프로퍼티 목록 저장 -->
+    <update id="updateLayerLayerProperties">
+        /* 레이어 프로퍼티 목록 저장 : layerMapper.updateProperties */
+        update layer_m
+            set properties = cast(#{properties} as jsonb)
+        where 1=1
+        and layer_id = #{layerId}
+    </update>
+</mapper>

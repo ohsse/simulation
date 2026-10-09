@@ -1,0 +1,61 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'java'
+}
+
+dependencies {
+    implementation project(':common')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    // swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
+
+    // (선택) API→배치 푸시/재시도 시
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'org.postgresql:postgresql'
+    // Tibero JDBC 는 상용 라이선스라 저장소에 포함하지 않는다. libs/tibero6-jdbc.jar 를 넣으면 자동으로 추가된다.
+    if (file("$rootDir/libs/tibero6-jdbc.jar").exists()) {
+        implementation(name: "tibero6-jdbc", ext: "jar")
+    }
+    implementation 'com.zaxxer:HikariCP' // Ensure HikariCP is included
+
+    // Caffeine Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+}
+
+
+/**
+ * 프로파일별로 빌드하기 위한 코드
+ */
+ext.profile = (!project.hasProperty('profile') || !profile) ? 'common' : profile
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources-env/${profile}"
+        }
+    }
+}
+
+// 리소스 중복 이슈 방지(앞선 경고 대응)
+tasks.named("processResources") {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+bootJar {
+    archiveFileName = 'api.jar'
+}
+
+jar {
+    enabled = false
+}

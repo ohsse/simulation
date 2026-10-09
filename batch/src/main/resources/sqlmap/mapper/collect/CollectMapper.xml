@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hscmt.simulation.collect.mapper.CollectMapper">
+    <!-- 계측데이터 저장 -->
+    <insert id="upsertTagData" parameterType="com.hscmt.simulation.collect.dto.MsrmUpsertDto">
+        /* 계측데이터 저장 : collectMapper.upsertTagData */
+        insert into msrm_l (tag_sn, msrm_dttm, msrm_val, rgst_id, rgst_dttm, mdf_id, mdf_dttm)
+        values (#{tagSn}, #{msrmDttm}, #{msrmVal}, #{rgstId}, #{rgstDttm}, #{mdfId}, #{mdfDttm})
+        on conflict (tag_sn, msrm_dttm)
+        do update
+           set mdf_id = excluded.mdf_id
+           , mdf_dttm = excluded.mdf_dttm
+           , msrm_val = excluded.msrm_val
+    </insert>
+</mapper>
